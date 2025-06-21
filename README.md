@@ -65,5 +65,8 @@ You should then be able to find the tuner at `http://localhost:5000` and the gui
 5. Enjoy:
 ![](screenshots/kodi_result.png)
 
+## Jellyfin (סנפיריבה)
+![](screenshots/jellyfin.png)
+
 ## Final Notes
 If someone wants to pay for a VPS to host this on the internet, let me know (through an issue or PR).
