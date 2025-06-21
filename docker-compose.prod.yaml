@@ -1,0 +1,31 @@
+services:
+  zipzup:
+    image: ghcr.io/szaionz/zipzup:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - json:/json
+    depends_on:
+      - redis
+      - guide-downloader
+      - selenium
+
+    restart: unless-stopped
+
+  guide-downloader:
+    image: ghcr.io/szaionz/zipzup:latest
+    entrypoint: ["sh", "-c", "chown -R abc:abc /json && crond -f"]
+    user: root
+    volumes:
+      - json:/json
+    restart: unless-stopped
+
+  redis:
+    image: valkey/valkey:8.1.2-alpine3.22
+    restart: unless-stopped
+  
+  selenium:
+    image: selenium/standalone-firefox:134.0-geckodriver-0.36-20250606
+    restart: unless-stopped
+volumes:
+  json: {}
