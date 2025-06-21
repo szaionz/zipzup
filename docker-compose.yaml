@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - json:/json
+    depends_on:
+      - redis
+      - cronie
+      - selenium
+
+  cronie:
+    build:
+      context: .
+    entrypoint: ["sh", "-c", "chown -R abc:abc /json && crond -f"]
+    user: root
+    volumes:
+      - json:/json
+
+  redis:
+    image: valkey/valkey:8.1.2-alpine3.22
+  
+  selenium:
+    image: selenium/standalone-firefox:134.0-geckodriver-0.36-20250606
+volumes:
+  json: {}
