@@ -8,10 +8,9 @@ RUN crontab -u abc /etc/crontabs/abc
 USER abc 
 
 WORKDIR /app
-COPY requirements.txt /app/
+COPY app/requirements.txt /app/
 RUN pip install --no-cache --upgrade pip setuptools && pip install -r requirements.txt
-COPY app.py epg.py tuner.m3u channels.json /app/
-COPY static /app/static
+COPY app /app
 
 ENTRYPOINT ["python3", "-m", "flask", "run", "-h", "0.0.0.0"]
 
