@@ -19,7 +19,7 @@ You will need a machine to host the server. This can be your computer for exampl
     ```yaml
     services:
         zipzup:
-            image: ghcr.io/szaionz/zipzup:latest
+            image: ghcr.io/szaionz/zipzup:stable
             ports:
             - "5000:5000"
             volumes:
@@ -32,7 +32,7 @@ You will need a machine to host the server. This can be your computer for exampl
             restart: unless-stopped
 
         guide-downloader:
-            image: ghcr.io/szaionz/zipzup:latest
+            image: ghcr.io/szaionz/zipzup:stable
             entrypoint: ["sh", "-c", "chown -R abc:abc /json && crond -f"]
             user: root
             volumes:
