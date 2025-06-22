@@ -44,6 +44,7 @@ def get_stream(url, driver, stream_name='index.m3u8'):
         network_requests = driver.execute_script(JS_get_network_requests)
         for n in network_requests:
             if stream_name in n["name"]:
+                logging.info(f'Request: {n}')
                 return n["name"]
         time.sleep(1)
 
@@ -65,6 +66,7 @@ def keshet():
                 if stream_url:
                     return requests.get(stream_url.decode('utf-8')).text, 200, {'Content-Type': 'application/vnd.apple.mpegurl'}
                 with webdriver.Remote(command_executor='http://selenium:4444/wd/hub', options=webdriver.ChromeOptions()) as driver:
+                    logging.info(f'User-Agent: {driver.execute_script("return navigator.userAgent;")}')
                     out_url=get_stream(URL, driver)
                     if out_url:
                         pr = parse.urlparse(out_url)
@@ -77,7 +79,10 @@ def keshet():
                         return "Stream not found", 404
         without_end = '/'.join(out_url.split('/')[:-1])
         r.set('keshet_stream_url', out_url, ex=timedelta(minutes=5))
-        text=requests.get(out_url).text
+        text=requests.get(out_url,
+                          
+                          headers={'User-Agent': request.user_agent.string}
+                          ).text
         lines = text.splitlines()
         outlines = []
         exp_time = None
@@ -91,22 +96,22 @@ def keshet():
                     exp_time = datetime.datetime.fromtimestamp(int(match.group(1)))
                     logging.info(f"Stream expiration time: {exp_time}")
                 outlines.append(without_end + '/' + line)
-        text = '\n'.join(outlines)
+        text = '\n'.join(outlines) + '\n'
     else:
         text = text.decode('utf-8')
         exp_time = datetime.datetime.fromtimestamp(float(r.get('keshet_index_m3u8_exp'))) if r.get('keshet_index_m3u8_exp') else None
     response = make_response(text)
-    if exp_time:
-        response.headers['Cache-Control'] = f'public, max-age={int((exp_time - datetime.datetime.now()).total_seconds())}'
+    # if exp_time:
+    #     response.headers['Cache-Control'] = f'public, max-age={int((exp_time - datetime.datetime.now()).total_seconds())}'
     response.headers['Content-Type'] = 'application/vnd.apple.mpegurl'
-    etag = hashlib.md5(text.encode('utf-8')).hexdigest()
+    # etag = hashlib.md5(text.encode('utf-8')).hexdigest()
     response.headers['ETag'] = etag
-    if exp_time and etag:
-        r.set(f'keshet_index_m3u8_etag:{etag}', text, ex=timedelta(seconds=int((exp_time - datetime.datetime.now()).total_seconds())))
-        r.set('keshet_index_m3u8', text, ex=timedelta(seconds=int((exp_time - datetime.datetime.now()).total_seconds())))
-    if exp_time:
-        r.set('keshet_index_m3u8_exp', exp_time.timestamp(), ex=timedelta(seconds=int((exp_time - datetime.datetime.now()).total_seconds())))
-    response.headers['Etag'] = etag
+    # if exp_time and etag:
+    #     r.set(f'keshet_index_m3u8_etag:{etag}', text, ex=timedelta(seconds=int((exp_time - datetime.datetime.now()).total_seconds())))
+    #     r.set('keshet_index_m3u8', text, ex=timedelta(seconds=int((exp_time - datetime.datetime.now()).total_seconds())))
+    # if exp_time:
+    #     r.set('keshet_index_m3u8_exp', exp_time.timestamp(), ex=timedelta(seconds=int((exp_time - datetime.datetime.now()).total_seconds())))
+    # response.headers['Etag'] = etag
     return response
 
 
