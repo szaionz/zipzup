@@ -1,5 +1,5 @@
 services:
-  app:
+  zipzup:
     build:
       context: .
     ports:
@@ -14,7 +14,7 @@ services:
   cronie:
     build:
       context: .
-    entrypoint: ["sh", "-c", "chown -R abc:abc /json && crond -f"]
+    entrypoint: ["sh", "-c", "chown -R abc:abc /json && su abc -c 'python3 /app/epg.py' && crond -f"]
     user: root
     volumes:
       - json:/json
@@ -23,6 +23,6 @@ services:
     image: valkey/valkey:8.1.2-alpine3.22
   
   selenium:
-    image: selenium/standalone-firefox:134.0-geckodriver-0.36-20250606
+    image: selenium/standalone-chromium
 volumes:
   json: {}

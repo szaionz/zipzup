@@ -1,0 +1,67 @@
+{
+  "kan": {
+    "11": {
+      "name": "כאן 11",
+      "img": "https://www.kan.org.il/media/hrmn21mx/logo_kan_11-1.svg?rmode=pad&rnd=133273478939970000",
+      "id": "4444",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_syhxntss/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+      "enabled": true
+    },
+    "33": {
+      "name": "מכאן",
+      "img": "https://www.kan.org.il/media/uwsbgolz/מכאן-לוגו-צבעוני.svg?rmode=pad&rnd=133324453267800000",
+      "id": "4532",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_vw6qllis/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+      "enabled": true
+    },
+    "80": {
+      "name": "חינוכית",
+      "img": "https://www.kan.org.il/media/g5ydkalc/חינוכית-לוגו-צבעוני-1.svg?rmode=pad&rnd=133324452769030000",
+      "id": "4471",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_vd30ud46/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+      "enabled": true
+    },
+    "kan_b": {
+      "name": "כאן ב",
+      "img": "https://www.kan.org.il/media/lvwlh2dz/ב-לוגו-צבעוני-1.svg?rmode=pad&rnd=133324452725130000",
+      "id": "4483",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_eu4h60uh/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8"
+    },
+    "kan_88": {
+      "name": "כאן 88",
+      "img": "https://www.kan.org.il/media/ex3ksw3u/88-לוגו-צבעוני-1.svg?rmode=pad&rnd=133324452683370000",
+      "id": "4504",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_vgikv6ai/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8"
+    },
+    "kan_g": {
+      "name": "כאן גימל",
+      "img": "https://www.kan.org.il/media/xvfdrllp/גימל-לוגו-צבעוני-1.svg?rmode=pad&rnd=133324452650170000",
+      "id": "4490",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_ovs9mqn0/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8"
+    },
+    "kan_tarbut": {
+      "name": "תרבות",
+      "img": "https://www.kan.org.il/media/eognzc0g/תרבות-לוגו-צבעוני-1.svg?rmode=pad&rnd=133324467635730000",
+      "id": "4497",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_krhoh5g1/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8"
+    },
+    "kan_music": {
+      "name": "כאן קול המוזיקה",
+      "img": "https://www.kan.org.il/media/o1tlbmew/קול-המוזיקה-לוגו-צבעוני-1.svg?rmode=pad&rnd=133324467470270000",
+      "id": "4518",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_f383er43/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8"
+    },
+    "kan_moreshet": {
+      "name": "כאן מורשת",
+      "img": "https://www.kan.org.il/media/cfemv3dt/schedule-image_moreshet.svg?rmode=pad&rnd=133836554674630000",
+      "id": "4511",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_77fh7ekt/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8"
+    },
+    "kan_reka": {
+      "name": "כאן REKA",
+      "img": "https://www.kan.org.il/media/ragjbyu2/רדיו-רקע-לוגו-צבעוני-1.svg?rmode=pad&rnd=133323573626870000",
+      "id": "4525",
+      "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_8gp8l2wf/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8"
+    }
+  }
+}

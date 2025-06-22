@@ -14,7 +14,9 @@ from datetime import timedelta
 TZ = pytz.timezone('Asia/Jerusalem')
 JSON_DIR = os.environ.get('JSON_DIR', '/json')
 GUIDE_COOLDOWN = timedelta(days=1)
-
+with open('/app/channels.json', 'r', encoding='utf-8') as f:
+    CHANNELS = json.load(f)
+    
 def epg_json_to_xml_tv(json_data):
     root = ET.Element("tv")
     
@@ -84,7 +86,7 @@ def get_i24_news_epg_json():
     return out_json
 
 
-def get_kan_epg_json():
+def get_kan_epg_json(channel_id='4444'):
     
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0',
@@ -96,7 +98,7 @@ def get_kan_epg_json():
         'DNT': '1',
         'Sec-GPC': '1',
         'Connection': 'keep-alive',
-        'Referer': 'https://www.kan.org.il/tv-guide/?channelId=4444',
+        'Referer': f'https://www.kan.org.il/tv-guide/?channelId={channel_id}',
         'Sec-Fetch-Dest': 'empty',
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Site': 'same-origin',
@@ -108,9 +110,9 @@ def get_kan_epg_json():
         dt = now + datetime.timedelta(days=dt_offset)
         date_str = dt.strftime('%d-%m-%Y')
         response = requests.get(
-            "https://www.kan.org.il/umbraco/surface/LoadBroadcastSchedule/LoadSchedule?channelId=4444&currentPageId=1517",
+            "https://www.kan.org.il/umbraco/surface/LoadBroadcastSchedule/LoadSchedule",
                                 params={
-                                    'channelId': '4444',
+                                    'channelId': f'{channel_id}',
                                     'currentPageId': '1517',
                                     'day': date_str,
                                     },
@@ -203,11 +205,12 @@ def get_base_epg_json():
     
 GUIDES = {
         '12': get_keshet_epg_json,
-        '11': get_kan_epg_json,
+        # '11': get_kan_epg_json,
         '14': get_now_14_epg_json,
         'epg': get_base_epg_json,
         'i24news': get_i24_news_epg_json,
         '13': get_reshet_epg_json,
+        **{k: lambda channel_id=channel['id']: get_kan_epg_json(channel_id) for k, channel in CHANNELS['kan'].items() if channel.get('enabled')}
     }
 
 def get_channel_path(channel):

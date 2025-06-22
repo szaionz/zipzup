@@ -24,16 +24,26 @@ app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 URL = "https://www.mako.co.il/mako-vod-live-tv/"
 RESHET_ROOT='https://reshet.g-mana.live/media/87f59c77-03f6-4bad-a648-897e095e7360/'
+
+with open('/app/channels.json', 'r', encoding='utf-8') as f:
+    CHANNELS = json.load(f)
+    
 with open('tuner.m3u', 'r') as f:
     PLAYLIST = f.read()
-def get_stream(url, driver):
+def get_stream(url, driver, stream_name='index.m3u8'):
     driver.get(url)
     # time.sleep(5)
     for _ in range(20):
-        JS_get_network_requests = "var performance = window.performance || window.msPerformance || window.webkitPerformance || {}; var network = performance.getEntries() || {}; return network;"
+        JS_get_network_requests = """
+
+            const perf = window.performance || window.msPerformance || window.webkitPerformance;
+            const network = perf.getEntriesByType("resource");
+            return network;
+
+        """
         network_requests = driver.execute_script(JS_get_network_requests)
         for n in network_requests:
-            if "index.m3u8" in n["name"]:
+            if stream_name in n["name"]:
                 return n["name"]
         time.sleep(1)
 
@@ -54,7 +64,7 @@ def keshet():
                 stream_url = r.get('keshet_stream_url')
                 if stream_url:
                     return requests.get(stream_url.decode('utf-8')).text, 200, {'Content-Type': 'application/vnd.apple.mpegurl'}
-                with webdriver.Remote(command_executor='http://selenium:4444/wd/hub', options=webdriver.FirefoxOptions()) as driver:
+                with webdriver.Remote(command_executor='http://selenium:4444/wd/hub', options=webdriver.ChromeOptions()) as driver:
                     out_url=get_stream(URL, driver)
                     if out_url:
                         pr = parse.urlparse(out_url)
@@ -113,7 +123,16 @@ def root():
     url = request.base_url
     parsed_url = parse.urlparse(url)
     base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    return PLAYLIST.replace('$HOST', base_url)
+    playlist = PLAYLIST.replace('$HOST', base_url)
+    for tvg, channel in CHANNELS['kan'].items():
+        if not channel.get('enabled'):
+            continue
+        id_ = channel['id']
+        name = channel['name']
+        stream = channel['stream']
+        playlist += f'#EXTINF:-1 tvg-chno={tvg} tvg-id="{tvg}" group-title="TV" tvg-logo="{base_url}/static/kan_pngs/{id_}.png", {name}\n'
+        playlist += f'{stream}\n\n'
+    return make_response(playlist, 200, {'Content-Type': 'application/vnd.apple.mpegurl'})
 
 @app.route('/epg.xml')
 def get_epg():
