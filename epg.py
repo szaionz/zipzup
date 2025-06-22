@@ -229,14 +229,14 @@ def sync_guides():
                 logging.info(f"Using cached EPG for channel {channel}")
                 continue
         try:
-            GUIDES[channel] = func()
+            guide = func()
         except Exception as e:
             logging.error(f"Failed to fetch EPG for channel {channel}: {e}")
-            GUIDES[channel] = []
-            continue
-        with open(get_channel_path(channel), 'w', encoding='utf-8') as f:
-            json.dump(GUIDES[channel], f, ensure_ascii=False)
-            logging.info(f"Saved EPG for channel {channel} to {get_channel_path(channel)}")
+            guide = []
+        if guide:
+            with open(get_channel_path(channel), 'w', encoding='utf-8') as f:
+                json.dump(guide, f, ensure_ascii=False)
+                logging.info(f"Saved EPG for channel {channel} to {get_channel_path(channel)}")
             
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
