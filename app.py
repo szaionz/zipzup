@@ -30,6 +30,11 @@ with open('/app/channels.json', 'r', encoding='utf-8') as f:
     
 with open('tuner.m3u', 'r') as f:
     PLAYLIST = f.read()
+@app.after_request
+def my_after_request(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
 def get_stream(url, driver, stream_name='index.m3u8'):
     driver.get(url)
     # time.sleep(5)
