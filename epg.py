@@ -123,13 +123,17 @@ def get_kan_epg_json(channel_id='4444'):
             raise Exception(f"Failed to fetch data for {date_str}: {response.status_code}")
         soup = BeautifulSoup(response.text, 'html.parser')
         # print(response.text)
+        def delocalize(src):
+            if src.startswith('/'):
+                return f"https://www.kan.org.il{src}"
+            return src
         out_json.extend(
             [
                 {
                     'start':date_parser.parse(item.find_next('p', class_='program-hour')['data-date-utc'], dayfirst=True).timestamp(),
                     'name': item.find('h3', class_='program-title').text.strip(),
                     'description': item.find('div', class_='program-description').text.strip(),
-                    'picture': f"https://www.kan.org.il{item.find('img', class_='img-fluid')['src']}" if item.find('img', class_='img-fluid') else None
+                    'picture': f"{delocalize(item.find('img', class_='img-fluid')['src'])}" if item.find('img', class_='img-fluid') else None
                 } for item in soup.find_all('div', class_='results-item')
             ]
         )
