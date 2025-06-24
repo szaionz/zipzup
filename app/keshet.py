@@ -18,8 +18,12 @@ from models import my_redis
 import redis_lock
 from selenium import webdriver, common
 from selenium.webdriver.chrome.options import Options
+from keshet_experimental import KeshetStreamSimulator
+import pickle
+from io import BytesIO
 
 KESHET_STREAM_EXPIRY = datetime.timedelta(minutes=5)
+SIMULATOR_EXPIRY = datetime.timedelta(hours=12)
 
 def get_stream(url, driver, stream_name='index.m3u8'):
     driver.get(url)
@@ -45,14 +49,58 @@ class KeshetStreamProvider(StreamProvider):
         super().__init__(**kwargs)
         self.index_stream = index_stream
         self.web = web
+        
+    def _get_profile_simulator_cache_key(self, profile_index: str) -> str:
+        return f'keshet:{self.tvg_id}_profile_simulator_{profile_index}'
+    
+    def _get_index_stream_cache_key(self) -> str:
+        return f'keshet:{self.tvg_id}_index_stream'
+    
+    def get_index_stream(self) -> str:
+        cached_stream = my_redis.get(self._get_index_stream_cache_key())
+        if cached_stream:
+            return cached_stream.decode('utf-8')
+        else:
+            return None
+        
+    def set_index_stream(self, stream_content: str):
+        my_redis.set(self._get_index_stream_cache_key(), stream_content, ex=SIMULATOR_EXPIRY)
+        
+        
+    def get_profile_simulator(self, profile_index: str) -> KeshetStreamSimulator:
+        cached_bytes = my_redis.get(self._get_profile_simulator_cache_key(profile_index))
+        if cached_bytes:
+            with BytesIO(cached_bytes) as f:
+                return pickle.load(f)
+            
+        else:
+            return None
+        
+    def set_profile_simulator(self, profile_index: str, simulator: KeshetStreamSimulator):
+        with BytesIO() as f:
+            pickle.dump(simulator, f)
+            my_redis.set(self._get_profile_simulator_cache_key(profile_index), f.getvalue(), ex=SIMULATOR_EXPIRY)
+            
+    def get_my_profile_endpoint(self, index) -> str:
+        """
+        Returns the endpoint for the profile simulator.
+        """
+        return f'/{self.tvg_id}/profile/{index}/profileManifest.m3u8'
+        
+        
     @override
     def get_stream_url(self, request_base_url: str = 'http://localhost:5000') -> str:
         return f'{request_base_url}/{self.tvg_id}/{self.index_stream}'
+    
+    
     
     @override
     def add_helper_routes(self, app):
         @app.route(f'/{self.tvg_id}/{self.index_stream}')
         def keshet_route():
+            index_stream_content = self.get_index_stream()
+            if index_stream_content:
+                return index_stream_content, 200, {'Content-Type': 'application/vnd.apple.mpegurl'}
             stream_url =my_redis.get(f'keshet_{self.tvg_id}_stream_url')
             if stream_url:
                 out_url = stream_url.decode('utf-8')
@@ -72,26 +120,35 @@ class KeshetStreamProvider(StreamProvider):
                         else:
                             return "Stream not found", 404
             without_end = '/'.join(out_url.split('/')[:-1])
-            my_redis.set(f'keshet_{self.tvg_id}_stream_url', out_url, ex=KESHET_STREAM_EXPIRY)
+            # my_redis.set(f'keshet_{self.tvg_id}_stream_url', out_url, ex=KESHET_STREAM_EXPIRY)
             text=requests.get(out_url,
                             
                             headers={'User-Agent': request.user_agent.string}
                             ).text
             lines = text.splitlines()
             outlines = []
-            exp_time = None
             for line in lines:
                 line = line.strip()
                 if line.startswith('#'):
                     outlines.append(line)
                 else:
-                    match = re.search('hdntl=exp=(.*?)~acl=', line)
-                    if match and match.group(1).isnumeric():
-                        exp_time = datetime.datetime.fromtimestamp(int(match.group(1)))
-                        logging.info(f"Stream expiration time: {exp_time}")
-                    outlines.append(without_end + '/' + line)
+                    profileManifestUrl = (without_end + '/' + line)
+                    match = re.search(r"/profile/(\d+)/hdntl", profileManifestUrl)
+                    if match:
+                        profile_index = int(match.group(1))
+                        outlines.append(f"{self.get_my_profile_endpoint(profile_index)}")
+                        self.set_profile_simulator(profile_index, KeshetStreamSimulator(profileManifestUrl))
+                    else:
+                        continue
             text = '\n'.join(outlines) + '\n'
+            self.set_index_stream(text)
             return text, 200, {'Content-Type': 'application/vnd.apple.mpegurl'}
+        @app.route(f'/{self.tvg_id}/profile/<int:profile_index>/profileManifest.m3u8')
+        def keshet_profile_route(profile_index: int):
+            simulator = self.get_profile_simulator(profile_index)
+            if not simulator:
+                return "Profile simulator not found", 404
+            return make_response(simulator.generate_playlist(), 200, {'Content-Type': 'application/vnd.apple.mpegurl'})
 
 
 class KeshetGuideProvider(GuideProvider):
