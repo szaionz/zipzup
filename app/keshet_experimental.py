@@ -15,7 +15,7 @@ class KeshetStreamSimulator:
                 self.media_sequence = int(line.split(':')[1])
                 continue
             if line.startswith('#EXT-X-PROGRAM-DATE-TIME'):
-                self.program_date_time = datetime.strptime(':'.join(line.split(':')[1:]), '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=UTC)
+                self.program_date_time = UTC.localize(datetime.strptime(':'.join(line.split(':')[1:]), '%Y-%m-%dT%H:%M:%S.%fZ'))
                 continue
             if line.startswith('https://'):
                 example_url = line

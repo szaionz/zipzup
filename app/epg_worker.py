@@ -16,8 +16,12 @@ def main():
         q.delete(synchronize_session=False)
         for provider in channel_providers:
             last_updated = session.query(func.max(GuideEntry.updated)).filter_by(channel=provider.get_guide_provider().tvg_id).first()[0]
-            if not last_updated or datetime.datetime.now(UTC) - last_updated.replace(tzinfo=UTC) >= GUIDE_COOLDOWN or os.environ.get('DEBUG', 'false').lower() == 'true':
-                entries = provider.get_guide_provider().get_guide()
+            if not last_updated or datetime.datetime.now(UTC) - UTC.localize(last_updated) >= GUIDE_COOLDOWN or os.environ.get('DEBUG', 'false').lower() == 'true':
+                try:
+                    entries = provider.get_guide_provider().get_guide()
+                except Exception as e:
+                    logging.error(f"Failed to fetch guide for provider {provider.get_guide_provider().tvg_id}: {e}")
+                    continue
                 if entries:
                     # session.query(GuideEntry).filter_by(channel=provider.get_guide_provider().tvg_id).delete()
                     max_datetime = max(entry.end for entry in entries)

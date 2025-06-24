@@ -30,8 +30,8 @@ class I24GuideProvider(GuideProvider):
             relevant_date = most_recent_sunday+ datetime.timedelta(days=item['day'])
             relevant_date_str = relevant_date.strftime('%Y-%m-%d')
 
-            time_start = datetime.datetime.strptime(f"{relevant_date_str} {item['startHour']}", f'%Y-%m-%d %H:%M').replace(tzinfo=LOCAL_TZ)
-            time_end = datetime.datetime.strptime(f"{relevant_date_str} {item['endHour']}", f'%Y-%m-%d %H:%M').replace(tzinfo=LOCAL_TZ)
+            time_start = LOCAL_TZ.localize(datetime.datetime.strptime(f"{relevant_date_str} {item['startHour']}", f'%Y-%m-%d %H:%M'))
+            time_end = LOCAL_TZ.localize(datetime.datetime.strptime(f"{relevant_date_str} {item['endHour']}", f'%Y-%m-%d %H:%M'))
             if time_end < time_start:
                 logging.warning(f"End time {time_end} is before start time {time_start} for program {item['show']['title']}, adding one day to end time.")
                 time_end += datetime.timedelta(days=1)

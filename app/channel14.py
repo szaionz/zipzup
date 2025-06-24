@@ -33,8 +33,8 @@ class Channel14GuideProvider(GuideProvider):
         for d_ in d:
             for date, programs in d_.items():
                 for program in programs:
-                    start_date = datetime.datetime.strptime(f'{date} {program["start"]}', '%Y-%m-%d %H:%M').replace(tzinfo=LOCAL_TZ)
-                    end_date = datetime.datetime.strptime(f'{date} {program["end"]}', '%Y-%m-%d %H:%M').replace(tzinfo=LOCAL_TZ)
+                    start_date = LOCAL_TZ.localize(datetime.datetime.strptime(f'{date} {program["start"]}', '%Y-%m-%d %H:%M'))
+                    end_date = LOCAL_TZ.localize(datetime.datetime.strptime(f'{date} {program["end"]}', '%Y-%m-%d %H:%M'))
                     if end_date.timestamp()<start_date.timestamp():
                         logging.warning(f"End date {end_date} is before start date {start_date} for program {program['program']}, adding one day to start date.")
                         end_date += datetime.timedelta(days=1)

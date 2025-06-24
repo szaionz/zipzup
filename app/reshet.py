@@ -25,7 +25,7 @@ class ReshetGuideProvider(GuideProvider):
             for program in week['shows']:
                 try:
                     out_json.append({
-                        'start': datetime.datetime.strptime(f"{program['show_date']} {program['start_time']}", '%Y-%m-%d %H:%M').replace(tzinfo=LOCAL_TZ),
+                        'start': LOCAL_TZ.localize(datetime.datetime.strptime(f"{program['show_date']} {program['start_time']}", '%Y-%m-%d %H:%M')),
                         'name': program['title'],
                         'description': program['desc'],
                         'picture': program['imageObj'].get('d') or program['imageObj'].get('m'),

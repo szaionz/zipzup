@@ -52,8 +52,8 @@ def epg():
         guide_entries = session.query(models.GuideEntry).all()
     programs = guide_entries
     for program in programs:
-        start_datetime = program.start.replace(tzinfo=UTC)
-        stop_datetime = program.end.replace(tzinfo=UTC)
+        start_datetime = UTC.localize(program.start)
+        stop_datetime = UTC.localize(program.end)
         programme_element = ET.SubElement(root, "programme", start=start_datetime.strftime("%Y%m%d%H%M%S %z"),
                                         stop=stop_datetime.strftime("%Y%m%d%H%M%S %z"),
                                         channel=program.channel)

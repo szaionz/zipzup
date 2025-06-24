@@ -57,7 +57,7 @@ class KanGuideProvider(GuideProvider):
             out_json.extend(
                 [
                     {
-                        'start':date_parser.parse(item.find_next('p', class_='program-hour')['data-date-utc'], dayfirst=True).replace(tzinfo=UTC),
+                        'start':UTC.localize(date_parser.parse(item.find_next('p', class_='program-hour')['data-date-utc'], dayfirst=True)),
                         'name': item.find('h3', class_='program-title').text.strip(),
                         'description': item.find('div', class_='program-description').text.strip(),
                         'picture': f"{delocalize(item.find('img', class_='img-fluid')['src'])}" if item.find('img', class_='img-fluid') else None
