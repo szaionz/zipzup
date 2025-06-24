@@ -7,6 +7,7 @@ import reshet
 import keshet
 import i24
 import channel14
+import knesset
 
 def inheritors(klass):
     subclasses = set()

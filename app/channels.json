@@ -124,5 +124,17 @@
                 "enabled": true
             }
         ]
+    },
+    "knesset": {
+        "channels": [
+            {
+                "id": "99",
+                "name": "ערוץ הכנסת",
+                "guide": "https://www.knesset.tv/umbraco/surface/broadcasts/getbroadcasts",
+                "stream": "https://kneset.gostreaming.tv/p2-kneset/_definst_/myStream/playlist.m3u8",
+                "img": "https://yt3.googleusercontent.com/bGbnIaUVFJhFhTSaSjQk6O-ZZ3UoJpQU1T4CNdKfJ91lbzsJvXQ35x_OZ4RCK2ga8l1KP9--=s900-c-k-c0x00ffffff-no-rj",
+                "enabled": true
+            }
+        ]
     }
 }
