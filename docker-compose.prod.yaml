@@ -1,6 +1,6 @@
 services:
   zipzup:
-    image: ghcr.io/zipzup/zipzup:nightly
+    image: ghcr.io/szaionz/zipzup:nightly
     ports:
       - "5000:5000"
     depends_on:
@@ -30,7 +30,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   guide-downloader:
-    image: ghcr.io/zipzup/zipzup:nightly
+    image: ghcr.io/szaionz/zipzup:nightly
     entrypoint: ["sh", "-c", "su abc -c 'python3 /app/epg_worker.py' && crond -f"]
     user: root
     environment:
