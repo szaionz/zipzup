@@ -19,35 +19,47 @@ You will need a machine to host the server. This can be your computer for exampl
     ```yaml
     services:
         zipzup:
-            image: ghcr.io/szaionz/zipzup:latest
+            image: ghcr.io/zipzup/zipzup:nightly
             ports:
             - "5000:5000"
-            volumes:
-            - json:/json
             depends_on:
             - redis
-            - guide-downloader
             - selenium
-
-            restart: unless-stopped
-
-        guide-downloader:
-            image: ghcr.io/szaionz/zipzup:latest
-            entrypoint: ["sh", "-c", "chown -R abc:abc /json && crond -f"]
-            user: root
-            volumes:
-            - json:/json
-            restart: unless-stopped
+            - postgresql
+            environment:
+            POSTGRES_USER: zipzup
+            POSTGRES_PASSWORD: zipzup
+            POSTGRES_DB: zipzup
+            POSTGRES_HOST: postgresql
 
         redis:
             image: valkey/valkey:8.1.2-alpine3.22
-            restart: unless-stopped
         
         selenium:
-            image: selenium/standalone-firefox:134.0-geckodriver-0.36-20250606
-            restart: unless-stopped
+            image: selenium/standalone-chromium
+
+        postgresql:
+            image: postgres:16-alpine
+            environment:
+            POSTGRES_USER: zipzup
+            POSTGRES_PASSWORD: zipzup
+            POSTGRES_DB: zipzup
+
+            volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+        guide-downloader:
+            image: ghcr.io/zipzup/zipzup:nightly
+            entrypoint: ["sh", "-c", "su abc -c 'python3 /app/epg_worker.py' && crond -f"]
+            user: root
+            environment:
+            POSTGRES_USER: zipzup
+            POSTGRES_PASSWORD: zipzup
+            POSTGRES_DB: zipzup
+            POSTGRES_HOST: postgresql
+
     volumes:
-        json: {}
+        postgres_data: {}
     ```
 
 4. Run
