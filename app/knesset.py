@@ -19,6 +19,13 @@ class KnessetGuideProvider(GuideProvider):
     def get_guide(self) -> List[GuideEntry]:
         now = datetime.datetime.now(LOCAL_TZ)
         out_json = []
+        
+        base_url = 'https://www.knesset.tv'
+        def delocalize_src(src: str) -> str:
+            if src.startswith('/'):
+                return f"{base_url}{src}"
+            return src
+            
 
         for dt_offset in range(-7, 7):
             req = requests.get(
@@ -46,7 +53,7 @@ class KnessetGuideProvider(GuideProvider):
                         'start': start,
                         'name': item.find('p', class_='broadcast-list-content-title').text.strip(),
                         'description': item.find('div', class_='broadcast-desc-alt').text.strip() if item.find('div', class_='broadcast-desc-alt') else '',
-                        'picture': item.find('div', class_='broadcastImage').find('img')['src'] if item.find('div', class_='broadcastImage') else None
+                        'picture': delocalize_src(item.find('div', class_='broadcastImage').find('img')['src']) if item.find('div', class_='broadcastImage') else None
                     }
                 )
         out_json = sorted(out_json, key=lambda x: x['start'])
