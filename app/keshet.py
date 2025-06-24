@@ -19,7 +19,7 @@ import redis_lock
 from selenium import webdriver, common
 from selenium.webdriver.chrome.options import Options
 
-KESHET_STREAM_EXPIRY = datetime.timedelta(hours=1)
+KESHET_STREAM_EXPIRY = datetime.timedelta(minutes=5)
 
 def get_stream(url, driver, stream_name='index.m3u8'):
     driver.get(url)
