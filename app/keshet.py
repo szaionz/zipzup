@@ -64,7 +64,7 @@ class KeshetStreamProvider(StreamProvider):
             return None
         
     def set_index_stream(self, stream_content: str):
-        my_redis.set(self._get_index_stream_cache_key(), stream_content, ex=SIMULATOR_EXPIRY)
+        my_redis.set(self._get_index_stream_cache_key(), stream_content)
         
         
     def get_profile_simulator(self, profile_index: str) -> KeshetStreamSimulator:
@@ -79,7 +79,7 @@ class KeshetStreamProvider(StreamProvider):
     def set_profile_simulator(self, profile_index: str, simulator: KeshetStreamSimulator):
         with BytesIO() as f:
             pickle.dump(simulator, f)
-            my_redis.set(self._get_profile_simulator_cache_key(profile_index), f.getvalue(), ex=SIMULATOR_EXPIRY)
+            my_redis.set(self._get_profile_simulator_cache_key(profile_index), f.getvalue())
             
     def get_my_profile_endpoint(self, index) -> str:
         """
@@ -92,6 +92,84 @@ class KeshetStreamProvider(StreamProvider):
     def get_stream_url(self, request_base_url: str = 'http://localhost:5000') -> str:
         return f'{request_base_url}/{self.tvg_id}/{self.index_stream}'
     
+    def _get_last_metadata_updated_key(self) -> str:
+        return f'keshet:{self.tvg_id}_last_metadata_updated'
+    
+    def _get_last_metadata_updated(self) -> Optional[datetime.datetime]:
+        last_updated = my_redis.get(self._get_last_metadata_updated_key())
+        if last_updated:
+            return datetime.datetime.fromisoformat(last_updated.decode('utf-8'))
+        return None
+    
+    def _set_last_metadata_updated(self, timestamp: datetime.datetime):
+        my_redis.set(self._get_last_metadata_updated_key(), timestamp.isoformat())
+        
+    def _get_max_profile_stream_key(self) -> str:
+        return f'keshet:{self.tvg_id}_max_profile_stream'
+    
+    def _get_max_profile_stream(self) -> Optional[int]:
+        max_profile = my_redis.get(self._get_max_profile_stream_key())
+        if max_profile:
+            return int(max_profile.decode('utf-8'))
+        return None
+    
+    def _set_max_profile_stream(self, profile_index: int):
+        my_redis.set(self._get_max_profile_stream_key(), str(profile_index))
+        
+    
+    def refresh_metadata_cache(self):
+        with redis_lock.Lock(my_redis, 'selenium'):
+            with webdriver.Remote(command_executor='http://selenium:4444/wd/hub', options=webdriver.ChromeOptions()) as driver:
+                out_url=get_stream(self.web, driver)
+                if out_url:
+                    pr = parse.urlparse(out_url)
+                    qs_dict = parse.parse_qs(pr.query)
+                    del qs_dict["b-in-range"]
+                    pr=pr._replace(query=parse.urlencode(qs_dict, doseq=True))
+                    out_url = pr.geturl()
+                else:
+                    logging.error("Failed to get stream URL from Keshet web page.")
+                    return
+
+        without_end = '/'.join(out_url.split('/')[:-1])
+        # my_redis.set(f'keshet_{self.tvg_id}_stream_url', out_url, ex=KESHET_STREAM_EXPIRY)
+        text=requests.get(out_url,
+                        ).text
+        lines = text.splitlines()
+        outlines = []
+        max_profile_index = 0
+        for line in lines:
+            line = line.strip()
+            if line.startswith('#'):
+                outlines.append(line)
+            else:
+                profileManifestUrl = (without_end + '/' + line)
+                match = re.search(r"/profile/(\d+)/hdntl", profileManifestUrl)
+                if match:
+                    profile_index = int(match.group(1))
+                    max_profile_index = max(max_profile_index, profile_index)
+                    outlines.append(f"{self.get_my_profile_endpoint(profile_index)}")
+                    self.set_profile_simulator(profile_index, KeshetStreamSimulator(profileManifestUrl))
+                else:
+                    continue
+        text = '\n'.join(outlines) + '\n'
+        
+        self.set_index_stream(text)
+        self._set_last_metadata_updated(datetime.datetime.now())
+        self._set_max_profile_stream(max_profile_index)
+        
+    def health_check(self) -> bool:
+        max_profile_index = self._get_max_profile_stream()
+        if max_profile_index is None:
+            return False
+        for profile_index in range(0, max_profile_index + 1):
+            simulator = self.get_profile_simulator(profile_index)
+            if not simulator:
+                return False
+            if not simulator.health_check():
+                logging.error(f"Profile {profile_index} health check failed.")
+                return False
+        return True
     
     
     @override
@@ -101,47 +179,10 @@ class KeshetStreamProvider(StreamProvider):
             index_stream_content = self.get_index_stream()
             if index_stream_content:
                 return index_stream_content, 200, {'Content-Type': 'application/vnd.apple.mpegurl'}
-            stream_url =my_redis.get(f'keshet_{self.tvg_id}_stream_url')
-            if stream_url:
-                out_url = stream_url.decode('utf-8')
             else:
-                with redis_lock.Lock(my_redis, 'selenium'):
-                    stream_url = my_redis.get(f'keshet_{self.tvg_id}_stream_url')
-                    if stream_url:
-                        return requests.get(stream_url.decode('utf-8')).text, 200, {'Content-Type': 'application/vnd.apple.mpegurl'}
-                    with webdriver.Remote(command_executor='http://selenium:4444/wd/hub', options=webdriver.ChromeOptions()) as driver:
-                        out_url=get_stream(self.web, driver)
-                        if out_url:
-                            pr = parse.urlparse(out_url)
-                            qs_dict = parse.parse_qs(pr.query)
-                            del qs_dict["b-in-range"]
-                            pr=pr._replace(query=parse.urlencode(qs_dict, doseq=True))
-                            out_url = pr.geturl()
-                        else:
-                            return "Stream not found", 404
-            without_end = '/'.join(out_url.split('/')[:-1])
-            # my_redis.set(f'keshet_{self.tvg_id}_stream_url', out_url, ex=KESHET_STREAM_EXPIRY)
-            text=requests.get(out_url,
-                            
-                            headers={'User-Agent': request.user_agent.string}
-                            ).text
-            lines = text.splitlines()
-            outlines = []
-            for line in lines:
-                line = line.strip()
-                if line.startswith('#'):
-                    outlines.append(line)
-                else:
-                    profileManifestUrl = (without_end + '/' + line)
-                    match = re.search(r"/profile/(\d+)/hdntl", profileManifestUrl)
-                    if match:
-                        profile_index = int(match.group(1))
-                        outlines.append(f"{self.get_my_profile_endpoint(profile_index)}")
-                        self.set_profile_simulator(profile_index, KeshetStreamSimulator(profileManifestUrl))
-                    else:
-                        continue
-            text = '\n'.join(outlines) + '\n'
-            self.set_index_stream(text)
+                return "Index stream not found", 404
+
+            
             return text, 200, {'Content-Type': 'application/vnd.apple.mpegurl'}
         @app.route(f'/{self.tvg_id}/profile/<int:profile_index>/profileManifest.m3u8')
         def keshet_profile_route(profile_index: int):

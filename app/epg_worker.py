@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 import logging
 from sqlalchemy import func
 import datetime
+from keshet import KeshetChannelProvider
 
 
 GUIDE_COOLDOWN = datetime.timedelta(hours=12)
@@ -41,6 +42,18 @@ def main():
                 logging.info(f"Skipping provider {provider.get_guide_provider().tvg_id} due to cooldown.")
 
         session.commit()
-        
+
+def health_check_and_refresh_keshet():
+    for provider in channel_providers:
+        if isinstance(provider, KeshetChannelProvider):
+            stream_provider = provider.get_stream_provider()
+            if not stream_provider.health_check():
+                logging.info(f"Keshet stream provider {stream_provider.tvg_id} health check failed, refreshing stream metadata")
+                stream_provider.refresh_metadata_cache()
+            else:
+                logging.info(f"Keshet stream provider {stream_provider.tvg_id} health check passed.")
+                
+
 if __name__ == '__main__':
     main()
+    health_check_and_refresh_keshet()

@@ -2,6 +2,7 @@ import requests
 from constants import UTC
 from datetime import datetime, timedelta
 
+
 class KeshetStreamSimulator:
     def __init__(self, profile_manifest_url, rewind_time=timedelta(minutes=30), datetime_output_period=8):
         text = requests.get(profile_manifest_url).text
@@ -68,6 +69,18 @@ class KeshetStreamSimulator:
             lines.append(self.media_sequence_to_url(start_media_sequence + offset))
             offset += 1
         return '\n'.join(lines) + '\n'
+    
+    def health_check(self):
+        now = datetime.now(UTC)
+        now_media_sequence = self.most_recent_media_sequence(now)
+        url = self.media_sequence_to_url(now_media_sequence)
+        try:
+            response = requests.head(url, timeout=5)
+            return response.status_code == 200
+        except requests.RequestException:
+            return False
+            
+
             
     
 
