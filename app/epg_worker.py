@@ -55,5 +55,5 @@ def health_check_and_refresh_keshet():
                 
 
 if __name__ == '__main__':
-    main()
     health_check_and_refresh_keshet()
+    main()
