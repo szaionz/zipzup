@@ -4,13 +4,12 @@ from sqlalchemy.orm import Session
 import logging
 from sqlalchemy import func
 import datetime
-from keshet import KeshetChannelProvider
+from keshet import KeshetChannelProvider, KeshetStreamProvider
 
 
 GUIDE_COOLDOWN = datetime.timedelta(hours=12)
 KEEP_BACKLOGS = datetime.timedelta(days=14)
 def main():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     with Session(engine) as session:
         q = session.query(GuideEntry).filter(GuideEntry.end < datetime.datetime.now(UTC) - KEEP_BACKLOGS)
         logging.info(f"Deleting {q.count()} old guide entries.")
@@ -46,14 +45,15 @@ def main():
 def health_check_and_refresh_keshet():
     for provider in channel_providers:
         if isinstance(provider, KeshetChannelProvider):
-            stream_provider = provider.get_stream_provider()
-            if not stream_provider.health_check():
-                logging.info(f"Keshet stream provider {stream_provider.tvg_id} health check failed, refreshing stream metadata")
+            stream_provider: KeshetStreamProvider = provider.get_stream_provider()
+            while not stream_provider.health_check():
+                logging.error(f"Keshet stream provider {stream_provider.tvg_id} health check failed. Refreshing")
                 stream_provider.refresh_metadata_cache()
-            else:
-                logging.info(f"Keshet stream provider {stream_provider.tvg_id} health check passed.")
+                
                 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
     health_check_and_refresh_keshet()
     main()

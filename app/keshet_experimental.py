@@ -2,7 +2,7 @@ import requests
 from constants import UTC
 from datetime import datetime, timedelta
 
-
+TIMESHIFT_BACK = timedelta(seconds=6)
 class KeshetStreamSimulator:
     def __init__(self, profile_manifest_url, rewind_time=timedelta(minutes=30), datetime_output_period=8):
         text = requests.get(profile_manifest_url).text
@@ -44,7 +44,7 @@ class KeshetStreamSimulator:
         time_delta = dt - self.program_date_time
         seconds = time_delta.total_seconds()
         media_sequence_delta = seconds // self.target_duration
-        return self.media_sequence + int(media_sequence_delta)
+        return self.media_sequence + int(media_sequence_delta) - 1 
     
     def media_sequence_to_datetime(self, media_sequence):
         return self.program_date_time + (media_sequence - self.media_sequence) * self.target_duration * timedelta(seconds=1)
@@ -62,7 +62,7 @@ class KeshetStreamSimulator:
             # f'#EXT-X-PROGRAM-DATE-TIME:{start_datetime.strftime("%Y-%m-%dT%H:%M:%S.%fZ")}'
         ]
         offset = 0
-        while self.media_sequence_to_datetime(start_media_sequence + offset) <= now:
+        while self.media_sequence_to_datetime(start_media_sequence + offset) <= now - TIMESHIFT_BACK:
             if offset % self.datetime_output_period == 0:
                 lines.append(f'#EXT-X-PROGRAM-DATE-TIME:{(self.media_sequence_to_datetime(start_media_sequence + offset)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")}')
             lines.append(f'#EXTINF:{self.target_duration:.12f},')
@@ -72,7 +72,7 @@ class KeshetStreamSimulator:
     
     def health_check(self):
         now = datetime.now(UTC)
-        now_media_sequence = self.most_recent_media_sequence(now)
+        now_media_sequence = self.most_recent_media_sequence(now-TIMESHIFT_BACK)
         url = self.media_sequence_to_url(now_media_sequence)
         try:
             response = requests.head(url, timeout=5)
