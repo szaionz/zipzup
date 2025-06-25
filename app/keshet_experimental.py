@@ -1,9 +1,19 @@
+import time
 import requests
 from constants import UTC
 from datetime import datetime, timedelta
+import logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-TIMESHIFT_BACK = timedelta(seconds=6)
+
+TIMESHIFT_BACK = timedelta(seconds=20)
 class KeshetStreamSimulator:
+    def most_recent_media_sequence(self, dt: datetime):
+        time_delta = dt - self.program_date_time
+        seconds = time_delta.total_seconds()
+        media_sequence_delta = seconds // self.target_duration
+        return self.media_sequence + int(media_sequence_delta) - 1 
+    
     def __init__(self, profile_manifest_url, rewind_time=timedelta(minutes=30), datetime_output_period=8):
         text = requests.get(profile_manifest_url).text
         lines = text.splitlines()
@@ -34,17 +44,25 @@ class KeshetStreamSimulator:
         self.divisor = (self.media_sequence-minor_index)//major_index
         self.rewind_time = rewind_time
         self.datetime_output_period = datetime_output_period
+        old_media_sequence = self.media_sequence
+        now = datetime.now(UTC)
+        while requests.head(self.media_sequence_to_url(self.most_recent_media_sequence(now))).status_code==200:
+            self.media_sequence += 1
+            now = datetime.now(UTC)
+        self.media_sequence = self.most_recent_media_sequence(now)
+        self.program_date_time = now
+        while requests.head(self.media_sequence_to_url(self.most_recent_media_sequence(datetime.now(UTC)))).status_code!=200:
+            self.program_date_time = datetime.now(UTC)
+            time.sleep(0.1)
+        logging.info(f'Pushed media sequence by {self.media_sequence - old_media_sequence} to {self.media_sequence} based on current time.')
+        
         
     def media_sequence_to_url(self, media_sequence):
         major_index = (media_sequence-1) // self.divisor
         minor_index = (media_sequence-1) % self.divisor+1
         return f"{self.profile_root}/{major_index:0{self.major_index_num_digits}d}/{self.ts_name_stem}_{minor_index:0{self.minor_index_num_digits}}.{self.extension}"
     
-    def most_recent_media_sequence(self, dt: datetime):
-        time_delta = dt - self.program_date_time
-        seconds = time_delta.total_seconds()
-        media_sequence_delta = seconds // self.target_duration
-        return self.media_sequence + int(media_sequence_delta) - 1 
+
     
     def media_sequence_to_datetime(self, media_sequence):
         return self.program_date_time + (media_sequence - self.media_sequence) * self.target_duration * timedelta(seconds=1)
@@ -62,7 +80,7 @@ class KeshetStreamSimulator:
             # f'#EXT-X-PROGRAM-DATE-TIME:{start_datetime.strftime("%Y-%m-%dT%H:%M:%S.%fZ")}'
         ]
         offset = 0
-        while self.media_sequence_to_datetime(start_media_sequence + offset) <= now - TIMESHIFT_BACK:
+        while self.media_sequence_to_datetime(start_media_sequence + offset) <= now:
             if offset % self.datetime_output_period == 0:
                 lines.append(f'#EXT-X-PROGRAM-DATE-TIME:{(self.media_sequence_to_datetime(start_media_sequence + offset)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")}')
             lines.append(f'#EXTINF:{self.target_duration:.12f},')
@@ -72,7 +90,7 @@ class KeshetStreamSimulator:
     
     def health_check(self):
         now = datetime.now(UTC)
-        now_media_sequence = self.most_recent_media_sequence(now-TIMESHIFT_BACK)
+        now_media_sequence = self.most_recent_media_sequence(now)
         url = self.media_sequence_to_url(now_media_sequence)
         try:
             response = requests.head(url, timeout=5)
