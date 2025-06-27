@@ -53,10 +53,10 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  guide-downloader:
+  worker:
     build:
       context: .
-    entrypoint: ["sh", "-c", "su abc -c 'python3 /app/epg_worker.py' && crond -f"]
+    entrypoint: "/app/worker_entrypoint.sh"
     user: root
     environment:
       POSTGRES_USER: zipzup
