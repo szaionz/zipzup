@@ -23,10 +23,10 @@ You will need a machine to host the server. This can be your computer for exampl
         ports:
         - "5000:5000"
         depends_on:
-        redis:
-            condition: service_healthy
-        postgresql:
-            condition: service_healthy
+            redis:
+                condition: service_healthy
+            postgresql:
+                condition: service_healthy
         environment:
         POSTGRES_USER: zipzup
         POSTGRES_PASSWORD: zipzup
@@ -81,12 +81,12 @@ You will need a machine to host the server. This can be your computer for exampl
         POSTGRES_DB: zipzup
         POSTGRES_HOST: postgresql
         depends_on:
-        selenium:
-            condition: service_healthy
-        redis:
-            condition: service_healthy
-        postgresql:
-            condition: service_healthy
+            selenium:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            postgresql:
+                condition: service_healthy
 
         
 
