@@ -1,6 +1,6 @@
 services:
   zipzup:
-    image: szaionz/zipzup:nightly
+    image: ghcr.io/szaionz/zipzup:nightly
     ports:
       - "5000:5000"
     depends_on:
@@ -53,7 +53,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   worker:
-    image: szaionz/zipzup:nightly
+    image: ghcr.io/szaionz/zipzup:nightly
     entrypoint: "/app/worker_entrypoint.sh"
     user: root
     environment:

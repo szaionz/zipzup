@@ -19,7 +19,7 @@ You will need a machine to host the server. This can be your computer for exampl
     ```yaml
     services:
         zipzup:
-            image: szaionz/zipzup:nightly
+            image: ghcr.io/szaionz/zipzup:nightly
             ports:
                 - "5000:5000"
             depends_on:
@@ -72,7 +72,7 @@ You will need a machine to host the server. This can be your computer for exampl
                 - postgres_data:/var/lib/postgresql/data
     
         worker:
-            image: szaionz/zipzup:nightly
+            image: ghcr.io/szaionz/zipzup:nightly
             entrypoint: "/app/worker_entrypoint.sh"
             user: root
             environment:
