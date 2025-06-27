@@ -1,0 +1,2 @@
+*/10 * * * * python3 /app/epg_worker.py
+0 */2 * * * * python /app/keshet_worker.py

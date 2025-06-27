@@ -167,9 +167,11 @@ class KeshetStreamProvider(StreamProvider):
             if not simulator:
                 logging.error(f"Profile {profile_index} health check failed.")
                 return False
-            if not simulator.health_check():
+            if not simulator.sync_and_health_check():
                 logging.error(f"Profile {profile_index} health check failed.")
                 return False
+            else:
+                self.set_profile_simulator(profile_index, simulator)
         logging.info(f'Keshet stream provider {self.tvg_id} health check passed for all profiles.')
         return True
     
