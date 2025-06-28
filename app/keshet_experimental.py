@@ -34,7 +34,20 @@ class KeshetStreamSimulator:
         media_sequence_delta = seconds // self.target_duration
         return self.media_sequence + int(media_sequence_delta) - 1 
     
-    def __init__(self, profile_manifest_url, rewind_time=timedelta(minutes=30), datetime_output_period=8):
+    def __init__(self, profile_manifest_url=None, rewind_time=timedelta(minutes=30), datetime_output_period=8, json=None):
+        if json:
+            self.profile_root = json['profile_root']
+            self.media_sequence = json['media_sequence']
+            self.program_date_time = datetime.fromisoformat(json['program_date_time']).astimezone(UTC)
+            self.target_duration = json['target_duration']
+            self.rewind_time = timedelta(seconds=json['rewind_time'])
+            self.datetime_output_period = json['datetime_output_period']
+            self.major_index_num_digits = json['major_index_num_digits']
+            self.minor_index_num_digits = json['minor_index_num_digits']
+            self.ts_name_stem = json['ts_name_stem']
+            self.extension = json['extension']
+            self.divisor = json['divisor']
+            return
         text = requests.get(profile_manifest_url).text
         lines = text.splitlines()
         for line in lines:
@@ -137,6 +150,21 @@ class KeshetStreamSimulator:
         self.program_date_time+= timedelta(seconds=self.target_duration)
         logging.info(f"Sync complete: fixed drift of {(self.program_date_time - old_dt_of_last_ts_plus_one).total_seconds()} seconds.")
         return True
+
+    def to_json(self):
+        return {
+            'profile_root': self.profile_root,
+            'media_sequence': self.media_sequence,
+            'program_date_time': self.program_date_time.isoformat(),
+            'target_duration': self.target_duration,
+            'rewind_time': self.rewind_time.total_seconds(),
+            'datetime_output_period': self.datetime_output_period,
+            'major_index_num_digits': self.major_index_num_digits,
+            'minor_index_num_digits': self.minor_index_num_digits,
+            'ts_name_stem': self.ts_name_stem,
+            'extension': self.extension,
+            'divisor': self.divisor,
+        }
             
         
             

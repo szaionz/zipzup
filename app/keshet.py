@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 import time
@@ -68,18 +69,20 @@ class KeshetStreamProvider(StreamProvider):
         
         
     def get_profile_simulator(self, profile_index: str) -> KeshetStreamSimulator:
-        cached_bytes = my_redis.get(self._get_profile_simulator_cache_key(profile_index))
-        if cached_bytes:
-            with BytesIO(cached_bytes) as f:
-                return pickle.load(f)
-            
+        cached_simulator = my_redis.get(self._get_profile_simulator_cache_key(profile_index))
+        if cached_simulator:
+            try:
+                simulator_data = json.loads(cached_simulator.decode('utf-8'))
+                return KeshetStreamSimulator(json=simulator_data)
+            except json.JSONDecodeError as e:
+                logging.error(f"Failed to decode cached simulator for profile {profile_index}: {e}")
+                return None
         else:
             return None
         
     def set_profile_simulator(self, profile_index: str, simulator: KeshetStreamSimulator):
-        with BytesIO() as f:
-            pickle.dump(simulator, f)
-            my_redis.set(self._get_profile_simulator_cache_key(profile_index), f.getvalue())
+
+        my_redis.set(self._get_profile_simulator_cache_key(profile_index), json.dumps(simulator.to_json()).encode('utf-8'))
             
     def get_my_profile_endpoint(self, index) -> str:
         """
