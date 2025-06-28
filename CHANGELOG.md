@@ -1,0 +1,6 @@
+- Added a bunch of channels
+- Keshet
+    - Made it actually work
+    - There's a job that runs in the background to keep the metadata sync'd up
+    - Works better than their website (in my opinion) 
+- Complete refactor of everything
