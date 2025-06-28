@@ -9,6 +9,8 @@ import aiohttp
 SYNC_BACK = timedelta(minutes=10)
 SYNC_FORWARD = timedelta(minutes=10)
 
+CATCHUP_FORWARD = timedelta(minutes=1)
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -94,8 +96,17 @@ class KeshetStreamSimulator:
              '#EXT-X-DISCONTINUITY-SEQUENCE:1',
             # f'#EXT-X-PROGRAM-DATE-TIME:{start_datetime.strftime("%Y-%m-%dT%H:%M:%S.%fZ")}'
         ]
+        first_after_offset = int((now-self.program_date_time)/ timedelta(seconds=self.target_duration)-(start_media_sequence - self.media_sequence)+1)
+        urls = [self.media_sequence_to_url(start_media_sequence + offset) for offset in range(first_after_offset, CATCHUP_FORWARD//timedelta(seconds=self.target_duration) + first_after_offset + 1)]
+        status_codes = list(asyncio.run(bulk_head(urls)))
         offset = 0
-        while self.media_sequence_to_datetime(start_media_sequence + offset) <= now:
+        def should_get_extra_ts():
+            a = status_codes.pop(0)
+            if a == 200:
+                logging.info(f"Adding extra TS segment")
+                return True
+            return False
+        while self.media_sequence_to_datetime(start_media_sequence + offset) <= now or should_get_extra_ts():
             if offset % self.datetime_output_period == 0:
                 lines.append(f'#EXT-X-PROGRAM-DATE-TIME:{(self.media_sequence_to_datetime(start_media_sequence + offset)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")}')
             lines.append(f'#EXTINF:{self.target_duration:.12f},')
