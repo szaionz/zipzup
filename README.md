@@ -72,7 +72,7 @@ You will need a machine to host the server. This can be your computer for exampl
                 - postgres_data:/var/lib/postgresql/data
     
         worker:
-            image: ghcr.io/szaionz/zipzup:nightly
+            image: ghcr.io/szaionz/zipzup:stable
             entrypoint: "/app/worker_entrypoint.sh"
             user: root
             environment:
