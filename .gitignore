@@ -1,0 +1,6 @@
+.venv
+.github
+__pycache__
+*.pyc
+*.pyo
+*.pyd

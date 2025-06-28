@@ -1,0 +1,140 @@
+{
+    "kan": {
+        "channels": [
+            {
+                "name": "כאן 11",
+                "id": "11",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_syhxntss/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "enabled": true,
+                "channel_id": "4444"
+            },
+            {
+                "name": "מכאן",
+                "id": "33",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_vw6qllis/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "enabled": true,
+                "channel_id": "4532"
+            },
+            {
+                "name": "חינוכית",
+                "id": "80",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_vd30ud46/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "enabled": true,
+                "channel_id": "4471"
+            },
+            {
+                "name": "כאן ב",
+                "id": "kan_b",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_eu4h60uh/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "channel_id": "4483"
+            },
+            {
+                "name": "כאן 88",
+                "id": "kan_88",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_vgikv6ai/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "channel_id": "4504"
+            },
+            {
+                "name": "כאן גימל",
+                "id": "kan_g",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_ovs9mqn0/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "channel_id": "4490"
+            },
+            {
+                "name": "תרבות",
+                "id": "kan_tarbut",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_krhoh5g1/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "channel_id": "4497"
+            },
+            {
+                "name": "כאן קול המוזיקה",
+                "id": "kan_music",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_f383er43/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "channel_id": "4518"
+            },
+            {
+                "name": "כאן מורשת",
+                "id": "kan_moreshet",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_77fh7ekt/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "channel_id": "4511"
+            },
+            {
+                "name": "כאן REKA",
+                "id": "kan_reka",
+                "stream": "https://cdnapisec.kaltura.com/p/2717431/sp/2717431/playManifest/entryId/1_8gp8l2wf/deliveryProfileId/672/protocol/https/format/applehttp/a.m3u8",
+                "channel_id": "4525"
+            }
+        ]
+    },
+    "reshet": {
+        "channels": [
+            {
+                "root": "https://reshet.g-mana.live/media/87f59c77-03f6-4bad-a648-897e095e7360/",
+                "index_stream": "profileManifest.m3u8",
+                "name": "רשת 13",
+                "img": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftop-tv.co.il%2Fwp-content%2Fuploads%2Fxreshet.jpg.pagespeed.ic.MRnrAFqHW7.jpg&f=1&nofb=1&ipt=90af7c7508d7185addc553daea8d104366412fc6a179b6da852f76069456616e",
+                "referer": "https://13tv.co.il/live/",
+                "guide": "https://13tv.co.il/_next/data/7KvrHSb4k5_4V5p4Z7CYE/he/tv-guide.json?all=tv-guide",
+                "id": "13",
+                "enabled": true
+            }
+        ]
+    },
+    "keshet": {
+        "channels": [
+            {
+                "web": "https://www.mako.co.il/mako-vod-live-tv/",
+                "name": "קשת 12",
+                "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLejnmC_jSSbaqbtMt5WSwQvmfMRN_UIUqLA&s",
+                "guide": "https://www.mako.co.il/AjaxPage?jspName=EPGResponse.jsp",
+                "id": "12",
+                "index_stream": "index.m3u8",
+                "enabled": true
+            }
+        ]
+    },
+    "14": {
+        "channels": [
+            {
+                "name": "ערוץ 14",
+                "stream": "https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8",
+                "img": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Flookaside.fbsbx.com%2Flookaside%2Fcrawler%2Fmedia%2F%3Fmedia_id%3D100070082665010&f=1&nofb=1&ipt=96cc5031e60c32ef23498c3492e927c88ac4b82c0c4a0856956ceb2340f2038f",
+                "guide": "https://www.c14.co.il/shidurim",
+                "id": "14",
+                "enabled": true
+            }
+        ]
+    },
+    "i24": {
+        "channels": [
+            {
+                "name": "i24NEWS",
+                "id": "15",
+                "stream": "https://bcovlive-a.akamaihd.net/d89ede8094c741b7924120b27764153c/eu-central-1/5377161796001/playlist.m3u8",
+                "img": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2F7%2F79%2FLOGO_i24NEWS.png%2F160px-LOGO_i24NEWS.png&f=1&nofb=1&ipt=b3ada90c07c205d8aab680bcd3791c9352b5681dcc0a2c10897e333f1b49d739",
+                "guide": "https://api.i24news.tv/v2/he/schedules",
+                "enabled": true
+            },
+            {
+                "name": "i24NEWS English",
+                "id": "34",
+                "stream": "https://bcovlive-a.akamaihd.net/ecf224f43f3b43e69471a7b626481af0/eu-central-1/5377161796001/playlist.m3u8",
+                "img": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2F7%2F79%2FLOGO_i24NEWS.png%2F160px-LOGO_i24NEWS.png&f=1&nofb=1&ipt=b3ada90c07c205d8aab680bcd3791c9352b5681dcc0a2c10897e333f1b49d739",
+                "guide": "https://api.i24news.tv/v2/en/schedules",
+                "enabled": true
+            }
+        ]
+    },
+    "knesset": {
+        "channels": [
+            {
+                "id": "99",
+                "name": "ערוץ הכנסת",
+                "guide": "https://www.knesset.tv/umbraco/surface/broadcasts/getbroadcasts",
+                "stream": "https://kneset.gostreaming.tv/p2-kneset/_definst_/myStream/playlist.m3u8",
+                "img": "https://yt3.googleusercontent.com/bGbnIaUVFJhFhTSaSjQk6O-ZZ3UoJpQU1T4CNdKfJ91lbzsJvXQ35x_OZ4RCK2ga8l1KP9--=s900-c-k-c0x00ffffff-no-rj",
+                "enabled": true
+            }
+        ]
+    }
+}

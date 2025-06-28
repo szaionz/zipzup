@@ -1,0 +1,40 @@
+services:
+  zipzup:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../app:/app
+    depends_on:
+      - redis
+      - selenium
+      - postgresql
+    environment:
+      POSTGRES_USER: zipzup
+      POSTGRES_PASSWORD: zipzup
+      POSTGRES_DB: zipzup
+      POSTGRES_HOST: postgresql
+      DEBUG: true
+    entrypoint: ["sleep", "infinity"]
+
+  redis:
+    image: valkey/valkey:8.1.2-alpine3.22
+  
+  selenium:
+    image: selenium/standalone-chromium
+
+  postgresql:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: zipzup
+      POSTGRES_PASSWORD: zipzup
+      POSTGRES_DB: zipzup
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres_data: {}
