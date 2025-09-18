@@ -5,7 +5,7 @@ import os
 from typing import List
 from urllib import parse
 from flask import Flask, request, redirect
-from constants import UTC
+from constants import UTC, BASE_URL
 import models
 from abc import ABC, abstractmethod
 import base_classes
@@ -73,7 +73,7 @@ def get_base_url():
     url = request.base_url
     parsed_url = parse.urlparse(url)
     base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    return base_url
+    return BASE_URL or base_url
 
     
 
