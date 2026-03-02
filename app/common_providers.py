@@ -53,4 +53,7 @@ class MPDProvider(StreamProvider):
         self.mpd_url = url
         
     def get_stream_url(self, request_base_url: str = 'http://localhost:5000') -> str:
-        return f'{request_base_url}/proxy/mpd/manifest.m3u8?{urllib.parse.urlencode({"d": self.mpd_url})}'
+        return f'{request_base_url}/proxy/mpd/manifest.m3u8?{urllib.parse.urlencode({
+            "d": self.mpd_url,
+            "remux_to_ts": "true"
+            })}'
