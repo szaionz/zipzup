@@ -1,0 +1,8 @@
+{
+    auto_https off
+}
+
+:5000 {
+    reverse_proxy /proxy/* mediaflow-proxy:8888
+    reverse_proxy zipzup:5000
+}
