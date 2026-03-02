@@ -89,8 +89,6 @@ You will need a machine to host the server. This can be your computer for exampl
 
       caddy:
         image: ghcr.io/szaionz/zipzup-proxy:nightly
-        volumes:
-          - ./Caddyfile:/etc/caddy/Caddyfile
         user: 1000:1000
         ports:
           - 127.0.0.1:5000:5000

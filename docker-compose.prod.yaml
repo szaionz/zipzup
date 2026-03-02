@@ -70,8 +70,6 @@ services:
         
   caddy:
     image: ghcr.io/szaionz/zipzup-proxy:nightly
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
     user: 1000:1000
     ports:
       - 127.0.0.1:5000:5000
