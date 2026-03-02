@@ -73,7 +73,7 @@
                 "index_stream": "profileManifest.m3u8",
                 "name": "רשת 13",
                 "img": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftop-tv.co.il%2Fwp-content%2Fuploads%2Fxreshet.jpg.pagespeed.ic.MRnrAFqHW7.jpg&f=1&nofb=1&ipt=90af7c7508d7185addc553daea8d104366412fc6a179b6da852f76069456616e",
-                "referer": "https://13tv.co.il/live/",
+                "additional_headers": {"Referer": "https://13tv.co.il/live/"},
                 "guide": "https://13tv.co.il/_next/data/7KvrHSb4k5_4V5p4Z7CYE/he/tv-guide.json?all=tv-guide",
                 "id": "13",
                 "enabled": true

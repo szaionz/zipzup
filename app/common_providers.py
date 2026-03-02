@@ -20,10 +20,10 @@ class ExternalLogoProvider(LogoProvider):
     def get_img(self, request_base_url: str = 'http://localhost:5000') -> str:
         return self.img
     
-class StreamWithRefererProvider(StreamProvider):
-    def __init__(self, referer: str, root: str, index_stream: str, **kwargs):
+class StreamWithAdditionalHeadersProvider(StreamProvider):
+    def __init__(self, additional_headers: dict, root: str, index_stream: str, **kwargs):
         super().__init__(**kwargs)
-        self.referer = referer
+        self.additional_headers = additional_headers
         self.root = root
         self.index_stream = index_stream
         
@@ -33,7 +33,7 @@ class StreamWithRefererProvider(StreamProvider):
     def _my_route(self, path):
         req = requests.get(
             f'{self.root}/{path}',
-            headers={'Referer': self.referer},
+            headers=self.additional_headers,
             params=request.args
         )
         if req.status_code != 200:
