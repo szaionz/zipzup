@@ -5,6 +5,7 @@ from typing_extensions import override
 from constants import *
 import datetime
 import requests
+import json
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
 from common_providers import ExternalLogoProvider, StreamWithAdditionalHeadersProvider
@@ -16,7 +17,38 @@ class ReshetGuideProvider(GuideProvider):
         
     @override
     def get_guide(self) -> List[GuideEntry]:
-        r = requests.get(self.guide)
+        base_url = "https://13tv.co.il"
+        
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+
+        # 1. Fetch the homepage HTML
+        # This will raise requests.exceptions.HTTPError for 4xx/5xx responses
+        # or ConnectionError for network issues.
+        response = requests.get(base_url, headers=headers)
+        response.raise_for_status()
+
+        # 2. Parse HTML to find the __NEXT_DATA__ script
+        soup = BeautifulSoup(response.text, "html.parser")
+        next_data_tag = soup.find("script", {"id": "__NEXT_DATA__"})
+
+        if not next_data_tag:
+            raise ValueError("Could not find <script id='__NEXT_DATA__'> tag in the HTML source.")
+
+        # 3. Load the JSON data and extract the buildId
+        try:
+            data = json.loads(next_data_tag.string)
+            build_id = data['buildId']
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Failed to decode __NEXT_DATA__ JSON: {e}")
+        except KeyError:
+            raise ValueError("The 'buildId' key was missing from the __NEXT_DATA__ JSON object.")
+
+        # 4. Construct the dynamic URL
+        dynamic_url = f"{base_url}/_next/data/{build_id}/he/tv-guide.json?all=tv-guide"
+
+        r = requests.get(dynamic_url)
         if r.status_code != 200:
             raise Exception("Failed to fetch Reshet EPG")
         data = r.json()
