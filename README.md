@@ -18,80 +18,106 @@ You will need a machine to host the server. This can be your computer for exampl
 3. Make a `docker-compose.yaml` file in `zipzup`
     ```yaml
     services:
-        zipzup:
-            image: ghcr.io/szaionz/zipzup:nightly
-            ports:
-                - "5000:5000"
-            depends_on:
-                redis:
-                    condition: service_healthy
-                postgresql:
-                    condition: service_healthy
-            environment:
-                POSTGRES_USER: zipzup
-                POSTGRES_PASSWORD: zipzup
-                POSTGRES_DB: zipzup
-                POSTGRES_HOST: postgresql
-    
-        redis:
-            image: valkey/valkey:8.1.2-alpine3.22
-            healthcheck:
-                test: redis-cli ping || exit 1
-                interval: 1m30s
-                timeout: 30s
-                retries: 5
-                start_period: 1m
-                start_interval: 5s
+      zipzup:
+        image: ghcr.io/szaionz/zipzup:nightly
+        depends_on:
+          redis:
+            condition: service_healthy
+          postgresql:
+            condition: service_healthy
+        environment:
+          POSTGRES_USER: zipzup
+          POSTGRES_PASSWORD: zipzup
+          POSTGRES_DB: zipzup
+          POSTGRES_HOST: postgresql
+
+      redis:
+        image: valkey/valkey:8.1.2-alpine3.22
+        healthcheck:
+          test: redis-cli ping || exit 1
+          interval: 1m30s
+          timeout: 30s
+          retries: 5
+          start_period: 1m
+          start_interval: 5s
+      
+      selenium:
+        image: selenium/standalone-chromium
+        healthcheck:
+          test: 'curl -f http://localhost:4444/wd/hub/status || exit 1'
+          interval: 1m30s
+          timeout: 30s
+          retries: 5
+          start_period: 1m
+          start_interval: 5s
+
+      postgresql:
+        image: postgres:16-alpine
+        environment:
+          POSTGRES_USER: zipzup
+          POSTGRES_PASSWORD: zipzup
+          POSTGRES_DB: zipzup
+        healthcheck:
+          test: >-
+            pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1; Chksum="$$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
+
+
+          interval: 5s
+          start_interval: 5s
+          start_period: 5m
+
+        volumes:
+          - postgres_data:/var/lib/postgresql/data
+
+      worker:
+        image: ghcr.io/szaionz/zipzup:nightly
+        entrypoint: "/app/worker_entrypoint.sh"
+        user: root
+        environment:
+          POSTGRES_USER: zipzup
+          POSTGRES_PASSWORD: zipzup
+          POSTGRES_DB: zipzup
+          POSTGRES_HOST: postgresql
+        depends_on:
+          selenium:
+            condition: service_healthy
+          redis:
+            condition: service_healthy
+          postgresql:
+            condition: service_healthy
+
+
+      caddy:
+        image: ghcr.io/szaionz/zipzup-proxy:nightly
+        volumes:
+          - ./Caddyfile:/etc/caddy/Caddyfile
+        user: 1000:1000
+        ports:
+          - 127.0.0.1:5000:5000
+      mediaflow-redis:
+        image: redis:7-alpine
+        restart: unless-stopped
+        healthcheck:
+          test: ["CMD", "redis-cli", "ping"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+
+      mediaflow-proxy:
+        image: mhdzumair/mediaflow-proxy@sha256:80b78bc128401b22cf18dd87fc25c46af1597bc422843d3da4c41849c00e64f1
+        # ports:
+        #   - "8889:8888"
+        environment:
+    #      - API_PASSWORD=your_password
+          - REDIS_URL=redis://mediaflow-redis:6379
+        depends_on:
+          mediaflow-redis:
+            condition: service_healthy
+
         
-        selenium:
-            image: selenium/standalone-chromium
-            healthcheck:
-                test: 'curl -f http://localhost:4444/wd/hub/status || exit 1'
-                interval: 1m30s
-                timeout: 30s
-                retries: 5
-                start_period: 1m
-                start_interval: 5s
-    
-        postgresql:
-            image: postgres:16-alpine
-            environment:
-                POSTGRES_USER: zipzup
-                POSTGRES_PASSWORD: zipzup
-                POSTGRES_DB: zipzup
-            healthcheck:
-                test: >-
-                    pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1; Chksum="$$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
-        
-        
-                interval: 5s
-                start_interval: 5s
-                start_period: 5m
-    
-            volumes:
-                - postgres_data:/var/lib/postgresql/data
-    
-        worker:
-            image: ghcr.io/szaionz/zipzup:nightly
-            entrypoint: "/app/worker_entrypoint.sh"
-            user: root
-            environment:
-                POSTGRES_USER: zipzup
-                POSTGRES_PASSWORD: zipzup
-                POSTGRES_DB: zipzup
-                POSTGRES_HOST: postgresql
-            depends_on:
-                selenium:
-                    condition: service_healthy
-                redis:
-                    condition: service_healthy
-                postgresql:
-                    condition: service_healthy
-    
-            
 
     volumes:
-        postgres_data: {}
+      postgres_data: {}
     ```
 
 4. Run

@@ -2,13 +2,14 @@ services:
   zipzup:
     build:
       context: .
-    ports:
-      - "5000:5000"
+    # ports:
+    #   - "5000:5000"
     depends_on:
       redis:
         condition: service_healthy
       postgresql:
         condition: service_healthy
+
     environment:
       POSTGRES_USER: zipzup
       POSTGRES_PASSWORD: zipzup
@@ -69,6 +70,32 @@ services:
       redis:
         condition: service_healthy
       postgresql:
+        condition: service_healthy
+  caddy:
+    image: caddy
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    user: 1000:1000
+    ports:
+      - 127.0.0.1:5000:5000
+  mediaflow-redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mediaflow-proxy:
+    image: mhdzumair/mediaflow-proxy@sha256:80b78bc128401b22cf18dd87fc25c46af1597bc422843d3da4c41849c00e64f1
+    # ports:
+    #   - "8889:8888"
+    environment:
+#      - API_PASSWORD=your_password
+      - REDIS_URL=redis://mediaflow-redis:6379
+    depends_on:
+      mediaflow-redis:
         condition: service_healthy
 
     
