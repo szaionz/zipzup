@@ -10,7 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  PROXY_IMAGE_NAME: zipzup-proxy
+  PROXY_IMAGE_NAME: szaionz/zipzup-proxy
 
 jobs:
   build-and-push-server-image:
