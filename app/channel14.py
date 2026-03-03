@@ -9,7 +9,7 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
-from common_providers import MPDProvider, ExternalLogoProvider
+from common_providers import MPDProvider, ExternalLogoProvider, DirectStreamProvider
 
 class Channel14GuideProvider(GuideProvider):
     def __init__(self, guide: str, **kwargs):
@@ -54,7 +54,7 @@ class Channel14ChannelProvider(ChannelProvider):
     
     def __init__(self, **kwargs):
         self.guide_provider = Channel14GuideProvider(**kwargs)
-        self.stream_provider = MPDProvider(**kwargs)
+        self.stream_provider = DirectStreamProvider(**kwargs)
         self.logo_provider = ExternalLogoProvider(**kwargs)
         
     @override

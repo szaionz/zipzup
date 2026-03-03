@@ -4,64 +4,64 @@
             {
                 "name": "כאן 11",
                 "id": "11",
-                "url": "https://n-121-91.il.cdn-redge.media/livedash/oil/kancdn-live/live/kan11/live.livx",
+                "stream": "https://n-121-91.il.cdn-redge.media/livedash/oil/kancdn-live/live/kan11/live.livx",
                 "enabled": true,
                 "channel_id": "4444"
             },
             {
                 "name": "מכאן",
                 "id": "33",
-                "url": "https://n-121-4.il.cdn-redge.media/livedash/oil/kancdn-live/live/makan/live.livx",
+                "stream": "https://n-121-4.il.cdn-redge.media/livedash/oil/kancdn-live/live/makan/live.livx",
                 "enabled": true,
                 "channel_id": "4532"
             },
             {
                 "name": "חינוכית",
                 "id": "80",
-                "url": "https://n-121-7.il.cdn-redge.media/livedash/oil/kancdn-live/live/kan_edu/live.livx",
+                "stream": "https://n-121-7.il.cdn-redge.media/livedash/oil/kancdn-live/live/kan_edu/live.livx",
                 "enabled": true,
                 "channel_id": "4471"
             },
             {
                 "name": "כאן ב",
                 "id": "kan_b",
-                "url": "https://n-121-5.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_reshet_bet/live.livx",
+                "stream": "https://n-121-5.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_reshet_bet/live.livx",
                 "channel_id": "4483"
             },
             {
                 "name": "כאן 88",
                 "id": "kan_88",
-                "url": "https://n-121-3.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_88/live.livx",
+                "stream": "https://n-121-3.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_88/live.livx",
                 "channel_id": "4504"
             },
             {
                 "name": "כאן גימל",
                 "id": "kan_g",
-                "url": "https://n-121-3.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_gimel/live.livx",
+                "stream": "https://n-121-3.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_gimel/live.livx",
                 "channel_id": "4490"
             },
             {
                 "name": "תרבות",
                 "id": "kan_tarbut",
-                "url": "https://n-121-4.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_tarbut/live.livx",
+                "stream": "https://n-121-4.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_tarbut/live.livx",
                 "channel_id": "4497"
             },
             {
                 "name": "כאן קול המוזיקה",
                 "id": "kan_music",
-                "url": "https://n-121-4.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_kol_hamuzika/live.livx",
+                "stream": "https://n-121-4.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_kol_hamuzika/live.livx",
                 "channel_id": "4518"
             },
             {
                 "name": "כאן מורשת",
                 "id": "kan_moreshet",
-                "url": "https://n-121-3.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_moreshet/live.livx",
+                "stream": "https://n-121-3.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_moreshet/live.livx",
                 "channel_id": "4511"
             },
             {
                 "name": "כאן REKA",
                 "id": "kan_reka",
-                "url": "https://n-121-93.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_reka/live.livx",
+                "stream": "https://n-121-93.il.cdn-redge.media/livedash/oil/kancdn-live/live/radio/kan_reka/live.livx",
                 "channel_id": "4525"
             }
         ]
@@ -97,7 +97,7 @@
         "channels": [
             {
                 "name": "ערוץ 14",
-                "url": "https://n-121-4.il.cdn-redge.media/livedash/oil/ch14/live/ch14/live.livx",
+                "stream": "https://n-121-4.il.cdn-redge.media/livedash/oil/ch14/live/ch14/live.livx",
                 "img": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Flookaside.fbsbx.com%2Flookaside%2Fcrawler%2Fmedia%2F%3Fmedia_id%3D100070082665010&f=1&nofb=1&ipt=96cc5031e60c32ef23498c3492e927c88ac4b82c0c4a0856956ceb2340f2038f",
                 "guide": "https://www.c14.co.il/shidurim",
                 "id": "14",

@@ -7,7 +7,7 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
-from common_providers import MPDProvider
+from common_providers import DirectStreamProvider, MPDProvider
 
 class KanGuideProvider(GuideProvider):
     def __init__(self, channel_id: int, **kwargs):
@@ -90,7 +90,7 @@ class KanChannelProvider(ChannelProvider):
     channel_group = 'kan'
     def __init__(self, **kwargs):
         self.guide_provider = KanGuideProvider(**kwargs)
-        self.stream_provider = MPDProvider(**kwargs)
+        self.stream_provider = DirectStreamProvider(**kwargs)
         self.logo_provider = KanLogoProvider(**kwargs)
         
     @override
