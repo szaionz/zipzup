@@ -8,7 +8,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
-from common_providers import ExternalLogoProvider, StreamWithAdditionalHeadersProvider
+from common_providers import ExternalLogoProvider, StreamWithAdditionalHeadersProvider, DirectStreamProvider
 
 class ReshetGuideProvider(GuideProvider):
     def __init__(self, id, guide, **kwargs):
@@ -82,7 +82,7 @@ class ReshetChannelProvider(ChannelProvider):
     
     def __init__(self, **kwargs):
         self.guide_provider = ReshetGuideProvider(**kwargs)
-        self.stream_provider = StreamWithAdditionalHeadersProvider(**kwargs)
+        self.stream_provider = DirectStreamProvider(**kwargs)
         self.logo_provider = ExternalLogoProvider(**kwargs)
         
     @override
