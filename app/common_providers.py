@@ -47,10 +47,10 @@ class StreamWithAdditionalHeadersProvider(StreamProvider):
         def my_route(path):
             return self._my_route(path)
         
-class MPDProvider(StreamProvider):
-    def __init__(self, url: str, **kwargs):
+class MpegDashStreamProvider(StreamProvider):
+    def __init__(self, stream: str, **kwargs):
         super().__init__(**kwargs)
-        self.mpd_url = url
+        self.mpd_url = stream
         
     def get_stream_url(self, request_base_url: str = 'http://localhost:5000') -> str:
         return f'{request_base_url}/proxy/mpd/manifest.m3u8?{urllib.parse.urlencode({"d": self.mpd_url})}'
