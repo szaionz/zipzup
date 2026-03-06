@@ -107,7 +107,7 @@ class ChannelProvider(ABC):
         :return: A list of M3U8 lines.
         """
         return '\n'.join([
-            f'#EXTINF:-1 tvg-chno={self.get_stream_provider().tvg_id} tvg-id="{self.get_stream_provider().tvg_id}" tvg-logo="{self.get_logo_provider().get_img(request_base_url)}" group-title="TV", {self.get_stream_provider().name}',
+            f'#EXTINF:-1 tvg-chno="{self.get_stream_provider().tvg_id}" tvg-id="{self.get_stream_provider().tvg_id}" tvg-logo="{self.get_logo_provider().get_img(request_base_url)}" group-title="TV", {self.get_stream_provider().name}',
             self.get_stream_provider().get_stream_url(request_base_url)
         ])+ '\n\n'
     
