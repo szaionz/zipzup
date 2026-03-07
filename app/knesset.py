@@ -19,11 +19,11 @@ class KnessetGuideProvider(GuideProvider):
     def get_guide(self) -> List[GuideEntry]:
         now = datetime.datetime.now(LOCAL_TZ)
         out_json = []
-        
-        # def delocalize_src(src: str) -> str:
-        #     if src.startswith('/'):
-        #         return f"{url}{src}"
-        #     return src
+        base_url = 'https://www.knesset.tv'
+        def delocalize_src(src: str) -> str:
+            if src.startswith('/'):
+                return f"{base_url}{src}"
+            return src
         req = requests.get(self.guide)
         if req.status_code != 200:
             raise Exception(f"Failed to fetch Knesset guide data for {self.tvg_id}:  {req.status_code}")
@@ -46,7 +46,7 @@ class KnessetGuideProvider(GuideProvider):
                         'start': start,
                         'name': item.find(class_='broadcast-list-content-title').text.strip(),
                         'description': item.find('div', class_='broadcast-desc-alt').text.strip() if item.find('div', class_='broadcast-desc-alt') else '',
-                        'picture': (item.find('div', class_='broadcastImage').find('img')['src']) if item.find('div', class_='broadcastImage') else None
+                        'picture': delocalize_src(item.find('div', class_='broadcastImage').find('img')['src']) if item.find('div', class_='broadcastImage') else None
                     }
                 )
         out_json = sorted(out_json, key=lambda x: x['start'])
