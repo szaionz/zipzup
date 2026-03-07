@@ -221,8 +221,8 @@ class KeshetGuideProvider(GuideProvider):
 class KeshetChannelProvider(ChannelProvider):
     channel_group = 'keshet'
     
-    def __init__(self, index_stream: str, web: str, guide: str, **kwargs):
-        self.stream_provider = KeshetStreamProvider(index_stream=index_stream, web=web, **kwargs)
+    def __init__(self, index_stream: str, stream: str, web: str, guide: str, **kwargs):
+        self.stream_provider = DirectStreamProvider(stream, **kwargs)
         self.guide_provider = KeshetGuideProvider(guide=guide, **kwargs)
         self.logo_provider = ExternalLogoProvider(**kwargs)
         
