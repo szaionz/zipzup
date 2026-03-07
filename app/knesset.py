@@ -20,40 +20,33 @@ class KnessetGuideProvider(GuideProvider):
         now = datetime.datetime.now(LOCAL_TZ)
         out_json = []
         
-        base_url = 'https://www.knesset.tv'
-        def delocalize_src(src: str) -> str:
-            if src.startswith('/'):
-                return f"{base_url}{src}"
-            return src
-            
-
-        for dt_offset in range(-7, 7):
-            req = requests.get(
-                self.guide,
-                params={
-                    'channelId': self.tvg_id,
-                    'day': f"{(now + datetime.timedelta(days=dt_offset)).strftime('%d/%m/%Y')} 00:00:00",
-                    "isinlobby": "false"
-                }
-            )
-            if req.status_code != 200:
-                raise Exception(f"Failed to fetch Kan guide data for {self.tvg_id}:  {req.status_code}")
-            soup = BeautifulSoup(req.text, 'html.parser')
-            date_str = (now + datetime.timedelta(days=dt_offset)).strftime('%Y-%m-%d')
-            old_start = None
-            start = None
-            for item in soup.find_all('div', class_='brodcast-listing-mobile'):
+        # def delocalize_src(src: str) -> str:
+        #     if src.startswith('/'):
+        #         return f"{url}{src}"
+        #     return src
+        req = requests.get(self.guide)
+        if req.status_code != 200:
+            raise Exception(f"Failed to fetch Knesset guide data for {self.tvg_id}:  {req.status_code}")
+        soup = BeautifulSoup(req.text, 'html.parser')
+        navbar = soup.find('div', class_='broadcasts-navbar')
+        dates = [div.get('data-date').strip() for div in navbar.find_all('div') if div.attrs.get('data-date')]
+        broadcast_tables = soup.find_all('table', class_='broadcasts-table')
+        old_start = None
+        start = None
+        for date, broadcast_table in zip(dates, broadcast_tables):
+            date_str = date
+            for item in broadcast_table.find_all('div', class_='brodcast-listing-desktop'):
                 old_start = start
-                start = LOCAL_TZ.localize(datetime.datetime.strptime(f"{date_str} {item.find_next('p', class_='broadcast-list-content-timing').text}", '%Y-%m-%d %H:%M'))
+                start = LOCAL_TZ.localize(datetime.datetime.strptime(f"{date_str} {item.find('p', class_='broadcast-list-content-timing').text.strip()}", '%Y-%m-%d %H:%M'))
                 if old_start and start < old_start:
-                    date_str = (now + datetime.timedelta(days=dt_offset + 1)).strftime('%Y-%m-%d')
-                    start = LOCAL_TZ.localize(datetime.datetime.strptime(f"{date_str} {item.find_next('p', class_='broadcast-list-content-timing').text}", '%Y-%m-%d %H:%M'))
+                    date_str = (LOCAL_TZ.localize(datetime.datetime.strptime(date_str, '%Y-%m-%d')) + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+                    start = LOCAL_TZ.localize(datetime.datetime.strptime(f"{date_str} {item.find('p', class_='broadcast-list-content-timing').text.strip()}", '%Y-%m-%d %H:%M'))
                 out_json.append(
                     {
                         'start': start,
-                        'name': item.find('p', class_='broadcast-list-content-title').text.strip(),
+                        'name': item.find(class_='broadcast-list-content-title').text.strip(),
                         'description': item.find('div', class_='broadcast-desc-alt').text.strip() if item.find('div', class_='broadcast-desc-alt') else '',
-                        'picture': delocalize_src(item.find('div', class_='broadcastImage').find('img')['src']) if item.find('div', class_='broadcastImage') else None
+                        'picture': (item.find('div', class_='broadcastImage').find('img')['src']) if item.find('div', class_='broadcastImage') else None
                     }
                 )
         out_json = sorted(out_json, key=lambda x: x['start'])
